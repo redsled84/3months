@@ -2,12 +2,14 @@ local Corridor = require 'corridor'
 local Globals = require 'globals'
 local Range = require 'range'
 local Room = require 'room'
+local Rat = require 'rat'
 local class = require 'middleclass'
 local util = require 'util'
 
 local tileSize = Globals.tileSize
 
-local Dungeon = class('Dungeon'); Dungeon.Rooms, Dungeon.Corridors = {}, {} 
+local Dungeon = class('Dungeon'); Dungeon.Rooms, Dungeon.Corridors = {}, {}
+Dungeon.creatures = {}
 
 function Dungeon:checkOverlappingRooms()
 	local amount = 0
@@ -50,6 +52,10 @@ function Dungeon:initialize(intersections, minIntersections, maxIntersections)
 	for i = 2, nRooms:Random() do
 		self.Rooms[i] = Room:new(widthRange, heightRange, tileSize, false, self.Corridors[i-1])
 		self.Corridors[i] = Corridor:new(self.Rooms[i], lengthRange, false)
+
+		if self.Rooms[i].width > 7 and self.Rooms[i].height > 7 then
+			self.creatures[#self.creatures+1] = Rat:spawnWithinArea(self.Rooms[i])
+		end
 	end
 
 	self.lastRoom = self.Rooms[#self.Rooms]
@@ -114,6 +120,11 @@ function Dungeon:draw()
 		g.setColor(0,0,255,230)
 		g.rectangle('line', corridor.x*tileSize, corridor.y*tileSize,
 			corridor.width*tileSize, corridor.height*tileSize)
+	end
+
+	for i, creature in ipairs(self.creatures) do
+		g.setColor(0,255,0,255)
+		g.rectangle('fill', creature.x*tileSize, creature.y*tileSize, creature.width, creature.height)
 	end
 end
 

@@ -9,6 +9,8 @@ local Rooms, Corridors = Dungeon.Rooms, Dungeon.Corridors
 local Board = require 'board'
 local Blocks = require 'blocks'
 local Player = require 'player'
+local Entity = require 'entity'
+local Rat = require 'rat'
 
 local Joystick = nil
 local timer = 0
@@ -32,7 +34,7 @@ function love.load()
 	Blocks:initializeFromBoardMap(Board)
 	-- Blocks:removeUnneccessaryBlocks(Rooms, Corridors)
 	Player:initialize(Rooms[1].x*tileSize+1, Rooms[1].y*tileSize+1, tileSize, tileSize)
-	camera = Camera.new(Player.x, Player.y, .5)
+	camera = Camera.new(Player.x, Player.y, .75)
 end
 
 function love.joystickadded(joystick)
@@ -43,8 +45,15 @@ function love.joystickremoved(joystick)
 	Joystick = joystick
 end
 
+
 function love.update(dt)
 	camera:lookAt(Player.x, Player.y)
+
+	for i=1, #Dungeon.creatures do
+		local creature = Dungeon.creatures[i]
+		creature:updatePath(dt)
+		-- Entity:update(creature)
+	end
 
 	Player:update(dt, Joystick)
 	local lastRoom = Dungeon.lastRoom

@@ -13,8 +13,10 @@ function Player:initialize(x, y, width, height)
 	self.height = height
 	self.vx = 0
 	self.vy = 0
-	self.spd = 600
-	self.top = 700
+	self.xThreshold = 60
+	self.yThreshold = 60
+	self.spd = 900
+	self.topVel = 750
 	self.triggered = true
 
 	world:add(self, x, y, width, height)
@@ -47,28 +49,34 @@ function Player:collision(dt)
 	end
 end
 
-function Player:joystickMovement(joystick)
-	Player.x = Player.x + joystick:getGamepadAxis('leftx') * 12
-	Player.y = Player.y + joystick:getGamepadAxis('lefty') * 12
+function Player:joystickMovement(dt, joystick)
+	self.vx = self.vx + joystick:getGamepadAxis('leftx') * 12
+	self.vy = self.vy + joystick:getGamepadAxis('lefty') * 12
+	self.x = self.x + self.vx * dt
+	self.y = self.y + self.vy * dt
 end
 
 function Player:keyboardMovement(dt)
-	if love.keyboard.isDown('d') then
+	if love.keyboard.isDown('d') and self.vx < self.topVel then
 		self.vx = self.vx + self.spd * dt
-	elseif love.keyboard.isDown('a') then
+	elseif love.keyboard.isDown('a') and self.vx > -self.topVel then
 		self.vx = self.vx - self.spd * dt
-	elseif self.vx > 10 or self.vx < -10 then
-	    self.vx = self.vx / 1.0001 * dt
-	else
+	elseif self.vx > self.xThreshold then
+	    self.vx = self.vx - self.spd * dt
+	elseif self.vx < -self.xThreshold then
+		self.vx = self.vx + self.spd * dt
+	elseif self.vx < self.xThreshold and self.vx > -self.xThreshold then
 		self.vx = 0
 	end
-	if love.keyboard.isDown('w') then
+	if love.keyboard.isDown('w') and self.vy > -self.topVel then
 		self.vy = self.vy - self.spd * dt
-	elseif love.keyboard.isDown('s') then
+	elseif love.keyboard.isDown('s') and self.vy < self.topVel then
 		self.vy = self.vy + self.spd * dt
-	elseif self.vy > 10 or self.vy < -10 then
-		self.vy = self.vy / 1.0001 * dt
-	else
+	elseif self.vy > self.yThreshold then
+		self.vy = self.vy - self.spd * dt
+	elseif self.vy < -self.yThreshold then
+		self.vy = self.vy + self.spd * dt
+	elseif self.vy < self.yThreshold and self.vy > -self.yThreshold then
 		self.vy = 0
 	end
 
@@ -78,7 +86,7 @@ end
 
 function Player:update(dt, joystick)
 	if joystick ~= nil and love.joystick.getJoystickCount() > 0 then
-		self:joystickMovement(joystick)
+		self:joystickMovement(dt, joystick)
 	else
 		self:keyboardMovement(dt)
 	end
