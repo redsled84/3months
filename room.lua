@@ -5,6 +5,7 @@ local Room = class('Room')
 function Room:initialize(widthRange, heightRange, tileSize, firstRoom, corridor)
 	self.width = widthRange:Random()
 	self.height = widthRange:Random()
+	self.mobs = 0
 
 
 	if firstRoom then
@@ -32,6 +33,7 @@ function Room:initialize(widthRange, heightRange, tileSize, firstRoom, corridor)
 			self.y = yRange:Random()
 		end
 	end
+
 end
 
 return Room

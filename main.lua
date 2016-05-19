@@ -49,12 +49,6 @@ end
 function love.update(dt)
 	camera:lookAt(Player.x, Player.y)
 
-	for i=1, #Dungeon.creatures do
-		local creature = Dungeon.creatures[i]
-		creature:updatePath(dt)
-		-- Entity:update(creature)
-	end
-
 	Player:update(dt, Joystick)
 	local lastRoom = Dungeon.lastRoom
 	Player:triggerSomeFuckingEvent(dt, lastRoom, function()

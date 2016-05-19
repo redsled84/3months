@@ -8,8 +8,10 @@ local util = require 'util'
 
 local tileSize = Globals.tileSize
 
-local Dungeon = class('Dungeon'); Dungeon.Rooms, Dungeon.Corridors = {}, {}
-Dungeon.creatures = {}
+local Dungeon = class('Dungeon')
+Dungeon.Rooms, Dungeon.Corridors = {}, {}
+Dungeon.Mobs, Dungeon.Items = {}, {}
+
 
 function Dungeon:checkOverlappingRooms()
 	local amount = 0
@@ -37,9 +39,10 @@ end
 function Dungeon:remove()
 	util.DeleteTableElements(self.Rooms)
 	util.DeleteTableElements(self.Corridors)
+	util.DeleteTableElements(self.Mobs)
 end
 
-function Dungeon:initialize(intersections, minIntersections, maxIntersections)
+function Dungeon:createStructure()
 	local nRooms = Range:new(5, 12)
 	local widthRange = Range:new(9, 16)	
 	local heightRange = Range:new(9, 16)
@@ -52,18 +55,25 @@ function Dungeon:initialize(intersections, minIntersections, maxIntersections)
 	for i = 2, nRooms:Random() do
 		self.Rooms[i] = Room:new(widthRange, heightRange, tileSize, false, self.Corridors[i-1])
 		self.Corridors[i] = Corridor:new(self.Rooms[i], lengthRange, false)
-
-		if self.Rooms[i].width > 7 and self.Rooms[i].height > 7 then
-			self.creatures[#self.creatures+1] = Rat:spawnWithinArea(self.Rooms[i])
-		end
 	end
 
-	self.lastRoom = self.Rooms[#self.Rooms]
-	
 	if #self.Corridors >= #self.Rooms then
 		table.remove(self.Corridors, #self.Corridors)
 	end
 
+	-- added for testing purposes
+	self.lastRoom = self.Rooms[#self.Rooms]
+end
+
+function Dungeon:getRandomRoom()
+	local roomRange = Range:new(2, #self.Rooms)
+	local i = roomRange:Random()
+	return self.Rooms[i]
+end
+
+-- replace corridors of certain length with rooms
+function Dungeon:replaceCorridorsWithRooms()
+	local lengthLimit = 6
 	for i = #self.Corridors, 1, -1 do
 		local c = self.Corridors[i]
 		if c.direction == 1 or c.direction == 3 and c.width < lengthLimit then
@@ -86,6 +96,52 @@ function Dungeon:initialize(intersections, minIntersections, maxIntersections)
 			table.remove(self.Corridors, i)
 		end
 	end
+end
+
+function Dungeon:spawnMobs()
+	local mobRange = Range:new(5, 8)
+	local maxMobsInRoom = 2
+
+	for i = 1, mobRange:Random() do
+		local randomRoom = self:getRandomRoom()
+		-- if randomRoom.mobs < maxMobsInRoom then
+			-- replace this table entry with adding a new mob from mob class
+			local xRange = Range:new(1, randomRoom.width-1)
+			local yRange = Range:new(1, randomRoom.height-1)
+
+			table.insert(self.Mobs, {
+				x = (randomRoom.x + xRange:Random()),
+				y = (randomRoom.y + yRange:Random()),
+				width = tileSize,
+				height = tileSize
+			})
+		-- end
+	end
+end
+
+function Dungeon:spawnItems()
+	local itemRange = Range:new(2, 5)
+
+	for i = 1, itemRange:Random() do
+		local randomRoom = self:getRandomRoom()
+
+		local xRange = Range:new(1, randomRoom.width-1)
+		local yRange = Range:new(1, randomRoom.height-1)
+		
+		table.insert(self.Items, {
+			x = randomRoom.x + xRange:Random(),
+			y = randomRoom.y + yRange:Random(),
+			width = tileSize,
+			height = tileSize
+		})
+	end
+end
+
+function Dungeon:initialize(intersections, minIntersections, maxIntersections)
+	self:createStructure()
+	self:replaceCorridorsWithRooms()
+	self:spawnMobs()
+	self:spawnItems()
 
 	if intersections then 
 		if self:checkOverlappingRooms() < minIntersections or 
@@ -122,9 +178,14 @@ function Dungeon:draw()
 			corridor.width*tileSize, corridor.height*tileSize)
 	end
 
-	for i, creature in ipairs(self.creatures) do
+	for i, mob in ipairs(self.Mobs) do
 		g.setColor(0,255,0,255)
-		g.rectangle('fill', creature.x*tileSize, creature.y*tileSize, creature.width, creature.height)
+		g.rectangle('fill', mob.x*tileSize, mob.y*tileSize, mob.width, mob.height)
+	end
+
+	for i, item in ipairs(self.Items) do
+		g.setColor(255,255,0,100)
+		g.rectangle('fill', item.x*tileSize, item.y*tileSize, item.width, item.height)
 	end
 end
 
