@@ -1,3 +1,4 @@
+local util = require 'util'
 local GLOBALS = require 'GLOBALS'
 local tileSize, world = GLOBALS.tileSize, GLOBALS.world
 

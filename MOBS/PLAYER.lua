@@ -13,11 +13,11 @@ function PLAYER:initialize(x, y, width, height)
 	self.height = height
 	self.vx = 0
 	self.vy = 0
-	self.xThreshold = 1
-	self.yThreshold = 1
-	self.spd = 900
-	self.decSpd = 300
-	self.topVel = 750
+	self.xThreshold = 5
+	self.yThreshold = 5
+	self.spd = 1500
+	self.decSpd = 600
+	self.topVel = 600
 	self.triggered = true
 
 	world:add(self, x, y, width, height)
@@ -62,63 +62,42 @@ end
 
 
 function PLAYER:keyboardMovement(dt)
-	-- if love.keyboard.isDown('d') and self.vx < self.topVel then
-	-- 	self.vx = self.vx + self.spd * dt
-	-- elseif love.keyboard.isDown('a') and self.vx > -self.topVel then
-	-- 	self.vx = self.vx - self.spd * dt
-	-- elseif self.vx > self.xThreshold then
-	--     self.vx = self.vx - self.spd * dt
-	-- elseif self.vx < -self.xThreshold then
-	-- 	self.vx = self.vx + self.spd * dt
-	-- elseif self.vx < self.xThreshold and self.vx > -self.xThreshold then
-	-- 	self.vx = 0
-	-- end
-	-- if love.keyboard.isDown('w') and self.vy > -self.topVel then
-	-- 	self.vy = self.vy - self.spd * dt
-	-- elseif love.keyboard.isDown('s') and self.vy < self.topVel then
-	-- 	self.vy = self.vy + self.spd * dt
-	-- elseif self.vy > self.yThreshold then
-	-- 	self.vy = self.vy - self.spd * dt
-	-- elseif self.vy < -self.yThreshold then
-	-- 	self.vy = self.vy + self.spd * dt
-	-- elseif self.vy < self.yThreshold and self.vy > -self.yThreshold then
-	-- 	self.vy = 0
-	-- end
-
 	if love.keyboard.isDown('d') and self.vx < self.topVel then
-		self.vx = self.vx + self.spd / 2 * dt
+		self.vx = self.vx + self.spd * dt
 	end
 	if love.keyboard.isDown('a') and self.vx > -self.topVel then
-		self.vx = self.vx - self.spd / 2 * dt
+		self.vx = self.vx - self.spd * dt
 	end
-
-	if not love.keyboard.isDown('d') and not love.keyboard.isDown('a') then
-		if self.vx > 0 then
-			self.vx = self.vx - self.decSpd * dt
-		elseif self.vx < 0 then
-			self.vx = self.vx + self.decSpd * dt
-		end
-		if self.vx < self.xThreshold or self.vx > -self.xThreshold then
-			self.vx = 0
-		end
+	if self.vx > 0 then
+		self.vx = self.vx - self.decSpd * dt
+	elseif self.vx < 0 then
+		self.vx = self.vx + self.decSpd * dt
+	end
+	if -self.xThreshold <= self.vx and self.vx <= self.xThreshold then
+		self.vx = 0
+	elseif self.vx >= self.topVel then
+		self.vx = self.topVel
+	elseif self.vx <= -self.topVel then
+		self.vx = -self.topVel
 	end
 
 	if love.keyboard.isDown('w') then
-		self.vy = self.vy - self.spd / 2 * dt
+		self.vy = self.vy - self.spd * dt
 	end
 	if love.keyboard.isDown('s') then
-		self.vy = self.vy + self.spd / 2 * dt
+		self.vy = self.vy + self.spd * dt
 	end
-
-	if not love.keyboard.isDown('w') and not love.keyboard.isDown('s') then
-		if self.vy > 0 then
-			self.vy = self.vy - self.decSpd * dt
-		elseif self.vy < 0 then
-			self.vy = self.vy + self.decSpd * dt
-		end
-		if self.vy < self.yThreshold or self.vy > -self.yThreshold then
-			self.vy = 0
-		end
+	if self.vy > 0 then
+		self.vy = self.vy - self.decSpd * dt
+	elseif self.vy < 0 then
+		self.vy = self.vy + self.decSpd * dt
+	end
+	if -self.yThreshold <= self.vy and self.vy <= self.yThreshold then
+		self.vy = 0
+	elseif self.vy >= self.topVel then
+		self.vy = self.topVel
+	elseif self.vy <= -self.topVel then
+		self.vy = -self.topVel
 	end
 
 	self.x = self.x + self.vx * dt
