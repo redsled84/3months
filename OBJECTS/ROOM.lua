@@ -1,8 +1,9 @@
-local Range = require 'range'
-local class = require 'middleclass'
-local Room = class('Room')
+local RANGE = require 'OBJECTS.RANGE'
+local class = require 'libs.middleclass'
+local ROOM = class('ROOM')
 
-function Room:initialize(widthRange, heightRange, tileSize, firstRoom, corridor)
+
+function ROOM:initialize(widthRange, heightRange, tileSize, firstRoom, corridor)
 	self.width = widthRange:Random()
 	self.height = widthRange:Random()
 	self.mobs = 0
@@ -14,8 +15,8 @@ function Room:initialize(widthRange, heightRange, tileSize, firstRoom, corridor)
 		self.x = math.floor(math.floor(love.graphics.getWidth() / tileSize) / 2 - self.width / 2) + xOffset
 		self.y = math.floor(math.floor(love.graphics.getHeight() / tileSize) / 2 - self.height / 2) + yOffset
 	else
-		local xRange = Range:new(corridor.x - self.width + 2, corridor.x-2)
-		local yRange = Range:new(corridor.y - self.height + 2, corridor.y-2)
+		local xRange = RANGE:new(corridor.x - self.width + 2, corridor.x-2)
+		local yRange = RANGE:new(corridor.y - self.height + 2, corridor.y-2)
 
 		self.enteringCorridor = corridor.direction
 
@@ -36,4 +37,5 @@ function Room:initialize(widthRange, heightRange, tileSize, firstRoom, corridor)
 
 end
 
-return Room
+
+return ROOM

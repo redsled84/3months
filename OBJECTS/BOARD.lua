@@ -1,27 +1,27 @@
+local GLOBALS = require 'GLOBALS'
+local class = require 'libs.middleclass'
 local util = require 'util'
-local class = require 'middleclass'
-local Globals = require 'globals'
 
-local tileSize = Globals.tileSize
+local tileSize = GLOBALS.tileSize
 
-local Board = class('Board')
+local BOARD = class('BOARD')
 
 local function compareXAndWidth(a, b) return a.x+a.width < b.x+b.width end
 local function compareYAndHeight(a, b) return a.y+a.height < b.y+b.height end
 local function compareX(a, b) return a.x < b.x end
 local function compareY(a, b) return a.y < b.y end
 
-function Board:initialize(Rooms, Corridors)
+function BOARD:initialize(rooms, corridors)
 	local firstX = {}
 	local firstY = {}
 	local sortedX = {}
 	local sortedY = {}
 	
-	for i=#Rooms, 1, -1 do
-		table.insert(sortedX, Rooms[i])
-		table.insert(sortedY, Rooms[i])
-		table.insert(firstX, Rooms[i])
-		table.insert(firstY, Rooms[i])
+	for i=#rooms, 1, -1 do
+		table.insert(sortedX, rooms[i])
+		table.insert(sortedY, rooms[i])
+		table.insert(firstX, rooms[i])
+		table.insert(firstY, rooms[i])
 		table.sort(sortedX, compareXAndWidth)
 		table.sort(sortedY, compareYAndHeight)
 		table.sort(firstX, compareX)
@@ -43,14 +43,14 @@ function Board:initialize(Rooms, Corridors)
 			local checkX = x + self.x
 			local checkY = y + self.y
 			
-			for i = 1, #Rooms do
-				if util.AABP(checkX, checkY, Rooms[i]) then 
+			for i = 1, #rooms do
+				if util.AABP(checkX, checkY, rooms[i]) then 
 					self.map[y][x] = 0
 				end
 			end
 			
-			for i = 1, #Corridors do
-				if util.AABP(checkX, checkY, Corridors[i]) then
+			for i = 1, #corridors do
+				if util.AABP(checkX, checkY, corridors[i]) then
 					self.map[y][x] = 0
 				end
 			end
@@ -63,8 +63,8 @@ function Board:initialize(Rooms, Corridors)
 	util.DeleteTableElements(firstY)
 end
 
-function Board:remove()
+function BOARD:remove()
 	util.DeleteTableElements(self.map)
 end
 
-return Board
+return BOARD

@@ -1,4 +1,4 @@
-local bump = require 'bump'
+local bump = require 'libs.bump'
 local world = bump.newWorld()
 return {
 	tileSize = 32,

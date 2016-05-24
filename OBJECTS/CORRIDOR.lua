@@ -1,8 +1,9 @@
-local Range = require 'range'
-local class = require 'middleclass'
-local Corridor = class('Corridor')
+local Range = require 'OBJECTS.RANGE'
+local class = require 'libs.middleclass'
+local CORRIDOR = class('CORRIDOR')
 
-function Corridor:initialize(room, lengthRange, firstCorridor)
+
+function CORRIDOR:initialize(room, lengthRange, firstCorridor)
 	-- 0 = North, 1 = East, 2 = South, 3 = West
 	self.direction = math.random(0, 3)
 
@@ -15,8 +16,6 @@ function Corridor:initialize(room, lengthRange, firstCorridor)
 	end
 
 	local length = lengthRange:Random()
-
-	-- print(self.oppositeDirection)
 
 	if self.direction == 0 then
 		self.x = math.random(room.x+2, room.x + room.width - 2)
@@ -44,4 +43,5 @@ function Corridor:initialize(room, lengthRange, firstCorridor)
 	end
 end
 
-return Corridor
+
+return CORRIDOR
